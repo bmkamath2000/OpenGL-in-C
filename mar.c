@@ -1,245 +1,137 @@
-#include <GL/gl.h>
-#include <GL/glu.h>
+// marble_2d.c
+// Simple 2D marble solitaire viewer (no lighting, no materials)
+// Draws an 18x18 board (9x9 cells each 2x2) and filled circles for marbles.
+
 #include <GL/glut.h>
+#include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
-int marble[9][9]={{0,0,0,1,1,1,0,0,0},
-					{0,0,0,1,1,1,0,0,0},
-					{0,0,0,1,1,1,0,0,0},
-					{1,1,1,1,1,1,1,1,1},
-					{1,1,1,1,1,1,1,1,1},
-					{1,1,1,1,1,1,1,1,1},
-					{0,0,0,1,1,1,0,0,0},
-					{0,0,0,1,1,1,0,0,0},
-					{0,0,0,1,1,1,0,0,0}};
-int wh=500,firstx=1,firsty=1,secondx,secondy,cfx=4,cfy=4,clickcount=-1;
-GLuint startList;
 
-void errorCallback(GLenum errorCode)
-{
-   const GLubyte *estring;
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
-   estring = gluErrorString(errorCode);
-   fprintf(stderr, "Quadric Error: %s\n", estring);
-   exit(0);
+int marble[9][9] = {
+    {0,0,0,1,1,1,0,0,0},
+    {0,0,0,1,1,1,0,0,0},
+    {0,0,0,1,1,1,0,0,0},
+    {1,1,1,1,1,1,1,1,1},
+    {1,1,1,1,0,1,1,1,1}, // center empty
+    {1,1,1,1,1,1,1,1,1},
+    {0,0,0,1,1,1,0,0,0},
+    {0,0,0,1,1,1,0,0,0},
+    {0,0,0,1,1,1,0,0,0}
+};
+
+int winW = 600, winH = 600;
+
+// Draw a filled circle (triangle fan) at (cx,cy) with radius r
+void drawFilledCircle(float cx, float cy, float r, int segments) {
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(cx, cy);
+    for (int i = 0; i <= segments; i++) {
+        float theta = 2.0f * M_PI * (float)i / (float)segments;
+        float x = r * cosf(theta);
+        float y = r * sinf(theta);
+        glVertex2f(cx + x, cy + y);
+    }
+    glEnd();
 }
 
-void init(void)
-{
-   GLUquadricObj *qobj;
-   GLfloat mat_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
-   GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-   GLfloat mat_shininess[] = { 50.0 };
-   GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
-   GLfloat model_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
+void drawBoard2D() {
+    // board background
+    glColor3f(0.55f, 0.35f, 0.18f); // brown
+    glBegin(GL_QUADS);
+      glVertex2f(0.0f, 0.0f);
+      glVertex2f(18.0f, 0.0f);
+      glVertex2f(18.0f, 18.0f);
+      glVertex2f(0.0f, 18.0f);
+    glEnd();
 
-   glClearColor(0.0, 0.0, 0.0, 0.0);
+    // optional grid lines (light)
+    glColor3f(0.25f, 0.15f, 0.08f);
+    for (int i = 0; i <= 9; ++i) {
+        float x = i * 2.0f;
+        glBegin(GL_LINES);
+          glVertex2f(x, 0.0f);
+          glVertex2f(x, 18.0f);
+        glEnd();
+        float y = i * 2.0f;
+        glBegin(GL_LINES);
+          glVertex2f(0.0f, y);
+          glVertex2f(18.0f, y);
+        glEnd();
+    }
 
-   glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
+    // holes (draw small pale circles on holes positions)
+    glColor3f(0.9f, 0.9f, 0.9f);
+    for (int i = 0; i < 9; ++i) {
+        for (int j = 0; j < 9; ++j) {
+            if (i==3 || i==4 || i==5 || j==3 || j==4 || j==5) {
+                float cx = i*2.0f + 1.0f;
+                float cy = j*2.0f + 1.0f;
+                drawFilledCircle(cx, cy, 0.5f, 32);
+            }
+        }
+    }
 
-   glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
-   glEnable(GL_DEPTH_TEST);
-
-/* Create 4 display lists, each with a different quadric object.
- * Different drawing styles and surface normal specifications
- * are demonstrated.
- */
-   startList = glGenLists(5);
-   qobj = gluNewQuadric();
-   gluQuadricCallback(qobj, GLU_ERROR, errorCallback);
-
-   gluQuadricDrawStyle(qobj, GLU_FILL); /* wireframe */
-   gluQuadricNormals(qobj, GLU_SMOOTH);
-   glNewList(startList, GL_COMPILE);
-      gluDisk(qobj, 0, 1.0, 20, 4);
-   glEndList();
-   gluQuadricDrawStyle(qobj, GLU_FILL); /* wireframe */
-      gluQuadricNormals(qobj, GLU_SMOOTH);
-      glNewList(startList+1, GL_COMPILE);
-         gluDisk(qobj, 0, 10.0, 50, 4);
-      glEndList();
-
-        gluQuadricDrawStyle(qobj, GLU_FILL); /* wireframe */
-              gluQuadricNormals(qobj, GLU_SMOOTH);
-
-              glNewList(startList+2, GL_COMPILE);
-              glPushAttrib(GL_ALL_ATTRIB_BITS);
-                    glPushMatrix();
-                    mat_ambient[0] = 1.0;
-                    mat_ambient[1]=1.0;
-                    mat_ambient[2] = 1.0;
-                      glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-                      glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-                      glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-        gluDisk(qobj, 0, 0.5, 20, 4);
-        glPopMatrix();
-              glPopAttrib();
-        glEndList();
-        gluQuadricDrawStyle(qobj, GLU_FILL); /* wireframe */
-                      gluQuadricNormals(qobj, GLU_SMOOTH);
-
-                      glNewList(startList+3, GL_COMPILE);
-                      glPushAttrib(GL_ALL_ATTRIB_BITS);
-                            glPushMatrix();
-                            mat_ambient[1] = 0.0;
-                            mat_ambient[2] = 1.0;
-                              glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-                              glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-                              glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-                gluDisk(qobj, 0, 0.45, 20, 4);
-                glPopMatrix();
-                      glPopAttrib();
-                glEndList();
-                glNewList(startList+4, GL_COMPILE);
-                                      glPushAttrib(GL_ALL_ATTRIB_BITS);
-                                            glPushMatrix();
-                                            mat_ambient[0] = 0.0;
-                                            mat_ambient[2] = 1.0;
-                                              glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-                                              glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-                                              glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-                                              glBegin(GL_POLYGON);
-                                              glVertex3f(0,0,0);
-                                              glVertex3f(2,0,0);
-                                              glVertex3f(2,2,0);
-                                              glVertex3f(0,2,0);
-                                              glEnd();
-                                glPopMatrix();
-                                      glPopAttrib();
-                                glEndList();
-
-
-}
-void drawboard()
-{int i,j;
-	glEnable(GL_LIGHTING);
-		   	   glShadeModel (GL_SMOOTH);
-		   	   glCallList(startList+1);
-		   	   glPushMatrix();
-		   	glTranslatef(-8.0, -8.0, 1.0);
-for(i=0;i<9;i++)
-	for(j=0;j<9;j++)
-		{
-		if(i==3||i==4||i==5||j==3||j==4||j==5)
-		{
-		glPushMatrix();
-		glTranslatef(i*2, j*2, 0.0);
-		glCallList(startList+2);
-		glPopMatrix();
-		}
-		}
-glTranslatef(0,0,1);
-for(i=0;i<9;i++)
-	for(j=0;j<9;j++)
-		{
-		if(marble[i][j]==1)
-		{
-		glPushMatrix();
-		glTranslatef(i*2, j*2, 1.0);
-		glCallList(startList+3);
-		glPopMatrix();
-		}
-		}
-glTranslatef(cfx*2-1,cfy*2-1,-1.5);
-glCallList(startList+4);
-
-glPopMatrix();
-}
-void display(void)
-{
-   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   glPushMatrix();
-
-drawboard();
-
-   glPopMatrix();
-   glFlush();
-   glutSwapBuffers();
+    // marbles (filled circles)
+    for (int i = 0; i < 9; ++i) {
+        for (int j = 0; j < 9; ++j) {
+            if (marble[i][j] == 1) {
+                float cx = i*2.0f + 1.0f;
+                float cy = j*2.0f + 1.0f;
+                glColor3f(0.0f, 0.2f, 0.8f); // blue marble
+                drawFilledCircle(cx, cy, 0.7f, 40);
+                // small highlight
+                glColor3f(1.0f, 1.0f, 1.0f);
+                drawFilledCircle(cx - 0.25f, cy + 0.25f, 0.18f, 20);
+            }
+        }
+    }
 }
 
-void reshape (int w, int h)
-{
-   glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   if (w <= h)
-      glOrtho(-10, 10, -10*(GLfloat)h/(GLfloat)w,
-         10*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
-   else
-      glOrtho(-10*(GLfloat)w/(GLfloat)h,
-         10*(GLfloat)w/(GLfloat)h, -10, 10, -10.0, 10.0);
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
-   wh=h;
+void display(void) {
+    glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Set up simple 2D orthographic view matching board coordinates
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.0, 18.0, 0.0, 18.0, -1.0, 1.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // Draw everything (no lighting)
+    drawBoard2D();
+
+    glutSwapBuffers();
 }
 
-void keyboard(unsigned char key, int x, int y)
-{
-   switch (key) {
-      case 27:
-         exit(0);
-         break;
-   }
+void reshape(int w, int h) {
+    winW = w; winH = h;
+    glViewport(0, 0, w, h);
+    glutPostRedisplay();
 }
-void mouse(int btn,int status,int x,int y)
-{int mid;
-	y=wh-y;
 
-if(btn==GLUT_LEFT_BUTTON&&status==GLUT_DOWN)
-{
-	clickcount=(clickcount+1)%2;
+void mouse(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        // Convert window coords to board coords
+        float bx = (float)x / (float)winW * 18.0f;
+        // note: GLUT y=0 at top, our ortho y=0 bottom -> invert
+        float by = (float)(winH - y) / (float)winH * 18.0f;
+        printf("Mouse click window: %d,%d -> board: %.2f, %.2f\n", x, y, bx, by);
+    }
+}
 
-		cfx=x/55;
-		cfy=y/55;
-		printf("%d %d %d %d\n",x,y,cfx,cfy);
-	if((marble[x/55][y/55]==1)&&clickcount==0)
-	{
-		firstx=x/55;
-		firsty=y/55;
-	}
-	if((marble[x/55][y/55]==0)&&clickcount==1)
-	{
-		secondx=x/55;
-		secondy=y/55;
-		if((firsty==secondy)&&(abs(firstx-secondx)==2))
-		{mid=(firstx+secondx)/2;
-			if(marble[mid][firsty]==1)
-				{marble[firstx][firsty]=0;
-				marble[mid][firsty]=0;
-				marble[secondx][secondy]=1;
-				}
-		}
-		else if((firstx==secondx)&&(abs(firsty-secondy)==2))
-		{
-			mid=(firsty+secondy)/2;
-						if(marble[firstx][mid]==1)
-							{marble[firstx][firsty]=0;
-							marble[firstx][mid]=0;
-							marble[secondx][secondy]=1;
-							}
-		}
-	}
-}
-glutPostRedisplay();
-}
-int main(int argc, char** argv)
-{
-   glutInit(&argc, argv);
-   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-   glutInitWindowSize(500, 500);
-   glutInitWindowPosition(100, 100);
-   glutCreateWindow(argv[0]);
-   init();
-   glutDisplayFunc(display);
-   glutReshapeFunc(reshape);
-   glutKeyboardFunc(keyboard);
-   glutMouseFunc(mouse);
-   marble[4][4]=0;
-   glutMainLoop();
-   return 0;
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(winW, winH);
+    glutCreateWindow("Marble Solitaire (2D, no lighting)");
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutMouseFunc(mouse);
+    glutMainLoop();
+    return 0;
 }
