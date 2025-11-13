@@ -1,4 +1,5 @@
-
+#include"Ghost.h"
+#include<GL/glut.h> 
 Ghost::~Ghost(void){}
 
 Ghost::Ghost(double tx, double ty)
