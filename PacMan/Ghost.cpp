@@ -1,7 +1,8 @@
 #include"Ghost.h"
+#include"Constants.h"
 #include<GL/glut.h> 
 #include<math.h>
-#define M_PI 3.14159265358979323846
+
 Ghost::~Ghost(void){}
 
 Ghost::Ghost(double tx, double ty)

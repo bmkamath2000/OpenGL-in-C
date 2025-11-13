@@ -14,12 +14,8 @@ Purpose: A simple Pacman game implemented using OpenGL.
 #include<math.h>
 #include<stdio.h>
 #include"Ghost.h"
-//#define M_PI 3.14159265358979323846264338327950288419716939937510
-#define false 0
-#define true 1
+#include"Constants.h"
 
-const int BOARD_X = 31;
-const int BOARD_Y = 28;
 
 int board_array[BOARD_X][BOARD_Y] =
 	              {{8,5,5,5,5,5,5,5,5,5,5,5,5,1,1,5,5,5,5,5,5,5,5,5,5,5,5,7},
@@ -765,12 +761,12 @@ void init()
 {
 
 
-    at   color[4];
-	Enable Lighting.
+    float color[4];
+	//Enable Lighting.
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
 
-	Ambient And Diffuse Lighting
+	//Ambient And Diffuse Lighting
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 
