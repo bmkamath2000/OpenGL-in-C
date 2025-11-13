@@ -13,6 +13,7 @@ Purpose: A simple Pacman game implemented using OpenGL.
 #include<GL/glut.h>
 #include<math.h>
 #include<stdio.h>
+#include"Ghost.h"
 //#define M_PI 3.14159265358979323846264338327950288419716939937510
 #define false 0
 #define true 1
@@ -183,277 +184,9 @@ int start_timer=3;
 
 
 
-class Ghost
-{
-   private:
-
-  public:
-         bool edible;
-	     int edible_max_time;
-	     int edible_timer;
-         bool eaten;
-	     bool transporting;
-         float color[3];
-	     double speed;
-	     double max_speed;
-	     bool in_jail;
-	     int jail_timer;
-	     double angle;
- 	     double x, y;
-
-	     Ghost(double, double);
-
-
-                ~Ghost(void);
-
-	     void Move(); //Move the Monster
-
-	     void Update(void);  //Update Monster State
-
-	     void Chase(double, double, bool*);  //Chase Pacman
-
-	     bool Catch(double, double);	//collision detection
-
-	     void Reinit(void);
-
-	     void Vulnerable(void);
-
-	     void Draw(void);   //Draw the Monster
-	     void game_over(void);
-
-};
 
 Ghost *ghost[4];
 
-Ghost::~Ghost(void){}
-
-Ghost::Ghost(double tx, double ty)
-{
-	tx = x;
-	ty = y;
-	angle = 90;
-	speed = max_speed=1;
-	color[0] = 1;
-	color[1] = 0;
-	color[2] = 0;
-	eaten = false;
-	edible_max_time =300;
-	edible = false;
-	in_jail = true;
-
-
-	jail_timer = 30;
-}
-
-void Ghost::Reinit(void)
-{
-	edible = false;
-	in_jail = true;
-	angle = 90;
-}
-
-//Move Monster
-void Ghost::Move()
-{
-	x +=  speed*cos(M_PI/180*angle);
-	y +=  speed*sin(M_PI/180*angle);
-}
-void Ghost::game_over()
-{
-
-}
-
-void Ghost::Update(void)
-{
-
-	if ((int)x == 0 && (int) y == 14 && (!(transporting)))
-	{
-		angle=180;
-	}
-
-	if (x < 0.1 && (int) y == 14)
-	{
-		x = 26.9;
-		transporting = true;
-	}
-
-	if ((int)x == 27 && (int) y == 14 && (!(transporting)))
-	{
-		angle=0;
-	}
-
-	if (x > 26.9 && (int) y == 14)
-
-	{
-		x = 0.1;
-		transporting = true;
-	}
-
-	if ((int)x == 2 || (int)x == 25)
-		transporting = false;
-
-	if (((int) x < 5 || (int) x > 21) && (int) y == 14 && !edible && !eaten)
-		speed = max_speed/2;
-		speed = max_speed;
-
-	//edibility
-	if (edible_timer == 0 && edible && !eaten)
-	{
-
-
-		edible = false;
-		speed = max_speed;
-	}
-                if (edible)
-		edible_timer--;
-
-	//JAIL
-	if (in_jail && (int) (y+0.9) == 11)
-	{
-		in_jail = false;
-		angle = 180;
-	}
-
-	if (in_jail && ((int)x == 13 || (int)x == 14))
-	{
-		angle = 270;
-	}
-
-	//if time in jail is up, position for exit
-	if (jail_timer == 0  && in_jail)
-
-	{
-		//move right to exit
-		if (x < 13)
-			angle = 0;
-		if (x > 14)
-			angle = 180;
-	}
-
-	//decrement time in jail counter
-	if (jail_timer > 0)
-		jail_timer--;
-
-	//EATEN GHOST SEND TO JAIL
-	if (eaten && ((int) x == 13 || (int) (x+0.9) == 14) && ((int)y > 10 && (int) y < 15))
-	{
-		in_jail = true;
-		angle = 90;
-		if((int) y == 14)
-		{
-			eaten = false;
-			speed = max_speed;
-			jail_timer = 66;
-			x = 11;
-		}
-	}
-}
-
-
-bool Ghost::Catch(double px, double py)
-{
-	// Collision Detection
-	if (px - x < 0.2 && px - x > -0.2 && py - y < 0.2 && py - y > -0.2)
-	{
-		return true;
-	}
-	return false;
-
-
-}
-
-//called when pacman eats a super pebble
-
-void Ghost::Vulnerable(void)
-{
-	if (!(edible))
-	{
-		angle = ((int)angle + 180)%360;
-		speed = max_speed;
-	}
-	edible = true;
-	edible_timer = edible_max_time;
-	//speed1=0.15;
-}
-
-
-
-void Ghost::Chase(double px, double py, bool *open_move)
-{
-              int c;
-	if (edible)
-		c = -1;
-	else
-		c = 1;
-
-	bool moved = false;
-
-	if ((int) angle == 0 || (int) angle == 180)
-	{
-		if ((int)c*py > (int)c*y && open_move[1])
-			angle = 90;
-
-		else if ((int)c*py < (int)c*y && open_move[3])
-			angle = 270;
-	}
-
-	else if ((int) angle == 90 || (int) angle == 270)
-	{
-
-		if ((int)c*px > (int)c*x && open_move[0])
-			angle = 0;
-		else if ((int)c*px < (int)c*x && open_move[2])
-			angle = 180;
-	}
-
-	//Random Moves Of Monsters
-
-	if ((int) angle == 0 && !open_move[0])
-		angle = 90;
-
-	if ((int) angle == 90 && !open_move[1])
-		angle = 180;
-
-	if ((int) angle == 180 && !open_move[2])
-		angle = 270;
-
-
-
-               if ((int) angle == 270 && !open_move[3])
-		angle = 0;
-
-	if ((int) angle == 0 && !open_move[0])
-		angle = 90;
-
-
-}
-
-void Ghost::Draw(void)
-{
-
-	if (!edible)
-		glColor3f(color[0],color[1],color[2]);
-
-	else
-	{
-		if (edible_timer < 150)
-			glColor3f((edible_timer/10)%2,(edible_timer/10)%2,1);
-		if (edible_timer >= 150)
-			glColor3f(0,0,1);
-
-	}
-
-	if (eaten)
-		glColor3f(1,1,0); //When Eaten By PacMan Change Color To Yellow
-
-	glPushMatrix();
-	glTranslatef(x,-y,0);
-	glTranslatef(0.5,0.6,0);
-	glTranslatef((float)BOARD_X/-2.0f, (float)BOARD_Y/2.0f,0.5);
-	glutSolidSphere(.5,10,10);
-	glPopMatrix();
-
-}
 
 
 void tp_restore(void)
@@ -672,7 +405,7 @@ void specialDown(int key,int x,int y)
 
 
 
-                           else if(key==GLUT_KEY_LEFT&& (int) b - b > -0.1 && angle1 != 180)//a
+        else if(key==GLUT_KEY_LEFT&& (int) b - b > -0.1 && angle1 != 180)//a
 		{
 			if (Open(a-1,b))
 			{
@@ -919,7 +652,9 @@ a = 0;
 	if(gameover==true)
 	{
 		glColor3f(1,0,0);
-		renderBitmapString(-5, 0.5,GLUT_BITMAP_HELVETICA_18 ,"GAME OVER");
+		char go_msg[20];
+		sprintf(go_msg, "GAME OVER");
+		renderBitmapString(-5, 0.5,GLUT_BITMAP_HELVETICA_18 , go_msg);
 	}
 
     char tmp_str[40];
@@ -1030,7 +765,7 @@ void init()
 {
 
 
-             /*   float   color[4];
+    at   color[4];
 	Enable Lighting.
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
@@ -1043,7 +778,7 @@ void init()
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, color);
 
 	color[0] = 1.0f; color[1] = 0.0f; color[2] = 1.0f; color[3] = 1.0f;
-	glLightfv(GL_LIGHT0, GL_AMBIENT, color);*/
+	glLightfv(GL_LIGHT0, GL_AMBIENT, color);
 
 
 	glEnable(GL_NORMALIZE);
@@ -1090,7 +825,7 @@ int main(int argc,char **argv)
 
 
 
-              glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
 	int start_x[4] = {11,12,15,16};
 
@@ -1127,7 +862,7 @@ int main(int argc,char **argv)
               }
 
 
-               pebbles_left = 244;
+    pebbles_left = 244;
   	glShadeModel(GL_SMOOTH);
 	glutMainLoop();
 	return 0;
