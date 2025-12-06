@@ -10,7 +10,7 @@ Purpose: A simple Pacman game implemented using OpenGL.
 
 */
 #include<ctype.h>
-#include<GL/glut.h>
+#include<GL/freeglut.h>
 #include<math.h>
 #include<stdio.h>
 #include"Ghost.h"

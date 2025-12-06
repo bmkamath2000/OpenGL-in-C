@@ -1,6 +1,6 @@
 #include"Ghost.h"
 #include"Constants.h"
-#include<GL/glut.h> 
+#include<GL/freeglut.h> 
 #include<math.h>
 
 Ghost::~Ghost(void){}
