@@ -1,0 +1,1 @@
+C:\protobuf-qt\bin\protoc.exe --cpp_out=. --proto_path=C:\Users\kamat\OneDrive\Documents\GitHub\OpenGL-in-C\pacman_net\proto C:\Users\kamat\OneDrive\Documents\GitHub\OpenGL-in-C\pacman_net\proto\pacman.proto

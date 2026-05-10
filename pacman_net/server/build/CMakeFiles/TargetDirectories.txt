@@ -1,0 +1,3 @@
+C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/pacman_net/server/build/CMakeFiles/pacman_server.dir
+C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/pacman_net/server/build/CMakeFiles/edit_cache.dir
+C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/pacman_net/server/build/CMakeFiles/rebuild_cache.dir

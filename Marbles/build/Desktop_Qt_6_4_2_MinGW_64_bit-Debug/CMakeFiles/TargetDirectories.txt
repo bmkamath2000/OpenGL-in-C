@@ -1,0 +1,5 @@
+C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/Marbles/build/Desktop_Qt_6_4_2_MinGW_64_bit-Debug/CMakeFiles/marble_solitaire.dir
+C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/Marbles/build/Desktop_Qt_6_4_2_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/Marbles/build/Desktop_Qt_6_4_2_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/Marbles/build/Desktop_Qt_6_4_2_MinGW_64_bit-Debug/CMakeFiles/marble_solitaire_autogen_timestamp_deps.dir
+C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/Marbles/build/Desktop_Qt_6_4_2_MinGW_64_bit-Debug/CMakeFiles/marble_solitaire_autogen.dir

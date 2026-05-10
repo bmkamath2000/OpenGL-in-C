@@ -1,0 +1,14 @@
+# ninja log v6
+7	1612	7999403614929650	pacman_autogen/timestamp	240d631cd86669e
+7	1612	7999403614929650	pacman_autogen/mocs_compilation.cpp	240d631cd86669e
+7	1612	7999403614929650	C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/PacMan/build/Desktop_Qt_6_4_2_MinGW_64_bit-Debug/pacman_autogen/timestamp	240d631cd86669e
+7	1612	7999403614929650	C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/PacMan/build/Desktop_Qt_6_4_2_MinGW_64_bit-Debug/pacman_autogen/mocs_compilation.cpp	240d631cd86669e
+1641	2986	7999403616320204	CMakeFiles/pacman.dir/Ghost.cpp.obj	971c5b7cc4872af9
+1623	4865	7999403616140838	CMakeFiles/pacman.dir/pacman_autogen/mocs_compilation.cpp.obj	f4926701c8dafcdd
+1629	4909	7999403616200289	CMakeFiles/pacman.dir/main.cpp.obj	c713fcb6956d786c
+45	273	7999405394230059	pacman_autogen/timestamp	240d631cd86669e
+45	273	7999405394230059	pacman_autogen/mocs_compilation.cpp	240d631cd86669e
+45	273	7999405394230059	C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/PacMan/build/Desktop_Qt_6_4_2_MinGW_64_bit-Debug/pacman_autogen/timestamp	240d631cd86669e
+45	273	7999405394230059	C:/Users/kamat/OneDrive/Documents/GitHub/OpenGL-in-C/PacMan/build/Desktop_Qt_6_4_2_MinGW_64_bit-Debug/pacman_autogen/mocs_compilation.cpp	240d631cd86669e
+275	3522	7999405396530081	CMakeFiles/pacman.dir/PacmanWidget.cpp.obj	b9aa9e7302e7d068
+3522	3829	7999405429009653	pacman.exe	ba838d27e774de52

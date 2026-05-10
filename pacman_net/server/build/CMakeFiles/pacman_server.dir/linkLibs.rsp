@@ -1,0 +1,1 @@
+ "C:/protobuf-qt/lib/libprotobuf.a" "C:/amqpcpp-qt/lib/libamqpcpp.a" -lws2_32 -lopengl32 -lglu32 -lopengl32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 
