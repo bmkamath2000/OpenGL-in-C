@@ -7,8 +7,7 @@
 // Pull in ALL your existing globals and functions from robo.c
 // (rename to robo.cpp, keep everything except main() and GLUT callbacks)
 extern void myinit();
-extern void
-display_scene(); // your display() logic, minus glFlush/glutSwapBuffers
+extern void display_scene(); // your display() logic, minus glFlush/glutSwapBuffers
 extern void myReshape(int w, int h);
 extern void animation();
 
