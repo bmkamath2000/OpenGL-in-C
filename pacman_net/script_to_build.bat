@@ -29,5 +29,10 @@ cmake .. -G "MinGW Makefiles" -DCMAKE_C_COMPILER=C:/Qt/Tools/mingw1120_64/bin/gc
 cmake --build . -j4
 cmake --install .
 cd ../..
-cd pacman_net
+cd pacman_net/client
+call "script.bat"
+cd ../..
+cd server
+call "script.bat"
+cd ../..
 call "script_to_run.bat"
